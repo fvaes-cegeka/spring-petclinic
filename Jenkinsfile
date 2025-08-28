@@ -3,6 +3,8 @@ pipeline {
 
     environment {
         PATH = "/usr/local/bin:${env.PATH}"
+        QODANA_TOKEN=credentials('qodana-token')
+        QODANA_ENDPOINT='https://qodana.cloud'
     }
 
     stages {
@@ -32,6 +34,20 @@ pipeline {
                     sourcePattern: '**/src/main/java'
                 )
              }
+        }
+        stage('Quality Analysis with Qodana 🔍') {
+            agent {
+                docker {
+                    args '''
+                      -v "${WORKSPACE}":/data/project
+                      --entrypoint=""
+                      '''
+                    image 'jetbrains/qodana-jvm-community:2025.1'
+                }
+            }
+            steps {
+                sh '''qodana'''
+            }
         }
         stage('Create Docker image and push 🐳') {
             steps {
