@@ -5,6 +5,7 @@ pipeline {
         stage('Build and Test 🛠️') {
             steps {
                 script {
+                    def tag = createTag("${env.BRANCH_NAME}", "${env.BUILD_NUMBER}")
                     currentBuild.displayName = "Build #${env.BUILD_NUMBER} - ${tag}"
                     sh './mvnw --batch-mode --no-transfer-progress -e -U clean install -DskipTests=true -T 1'
                     sh './mvnw --batch-mode --no-transfer-progress -e -U verify -Pjacoco -T 1'
