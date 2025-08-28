@@ -2,6 +2,14 @@ pipeline {
     agent any
 
     stages {
+        stage('Debug docker') {
+            steps {
+                sh 'echo $PATH'
+                sh 'which docker'
+                sh 'docker --version'
+            }
+        }
+
         stage('Build and Test 🛠️') {
             steps {
                 script {
