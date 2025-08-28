@@ -1,20 +1,6 @@
 pipeline {
     agent any
 
-    script {
-        def createDockerTag(String branchName) {
-            def pom = readMavenPom(file: 'pom.xml')
-            def version = pom.version
-            if (branchName == 'main') {
-                return version
-            } else {
-                def branchSuffix = branchName.contains('/') ? branchName.tokenize('/').last() : branchName
-                return "${version}.${branchSuffix}"
-            }
-        }
-        env.TAG = createDockerTag(env.BRANCH_NAME)
-    }
-
     stages {
         stage('Build and Test 🛠️') {
             steps {
@@ -42,7 +28,8 @@ pipeline {
             steps {
                 script {
                     def namespace = "fvaescegeka"
-                    def imageName = "${namespace}:${env.TAG}"
+                    def tag = createTag("${env.BRANCH_NAME}")
+                    def imageName = "${namespace}:${tag}"
 
                     withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', usernameVariable: 'DOCKERHUB_USERNAME', passwordVariable: 'DOCKERHUB_PASSWORD')]) {
                         sh "docker build -t ${imageName} ."
@@ -52,5 +39,16 @@ pipeline {
                 }
             }
         }
+    }
+}
+
+def createTag(String branchName) {
+    def pom = readMavenPom(file: 'pom.xml')
+    def version = pom.version
+    if (branchName == 'main') {
+        return version
+    } else {
+        def branchSuffix = branchName.contains('/') ? branchName.tokenize('/').last() : branchName
+        return "${version}.${branchSuffix}"
     }
 }
