@@ -6,14 +6,6 @@ pipeline {
     }
 
     stages {
-        stage('Debug docker') {
-            steps {
-                sh 'echo $PATH'
-                sh 'which docker'
-                sh 'docker --version'
-            }
-        }
-
         stage('Build and Test 🛠️') {
             steps {
                 script {
@@ -44,14 +36,14 @@ pipeline {
         stage('Create Docker image and push 🐳') {
             steps {
                 script {
-                    def namespace = "fvaescegeka"
+                    def imageName = "fvaescegeka/spring-petclinic"
                     def tag = createTag("${env.BRANCH_NAME}", "${env.BUILD_NUMBER}")
-                    def imageName = "${namespace}:${tag}"
+                    def image = "${imageName}:${tag}"
 
                     withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', usernameVariable: 'DOCKERHUB_USERNAME', passwordVariable: 'DOCKERHUB_PASSWORD')]) {
-                        sh "docker build -t ${imageName} ."
+                        sh "docker build -t ${image} ."
                         sh "echo \$DOCKERHUB_PASSWORD | docker login -u \$DOCKERHUB_USERNAME --password-stdin"
-                        sh "docker push ${imageName}"
+                        sh "docker push ${image}"
                     }
                 }
             }
