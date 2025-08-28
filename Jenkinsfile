@@ -35,20 +35,21 @@ pipeline {
                 )
              }
         }
-//         stage('Quality Analysis with Qodana 🔍') {
-//             agent {
-//                 docker {
-//                     args '''
-//                       -v "${WORKSPACE}":/data/project
-//                       --entrypoint=""
-//                       '''
-//                     image 'jetbrains/qodana-jvm-community:2025.1'
-//                 }
-//             }
-//             steps {
-//                 sh '''qodana'''
-//             }
-//         }
+        stage('Quality Analysis with Qodana 🔍') {
+            agent {
+                docker {
+                    args '''
+                      -v "${WORKSPACE}":/data/project
+                      -v /var/run/docker.sock:/var/run/docker.sock
+                      --entrypoint=""
+                      '''
+                    image 'jetbrains/qodana-jvm-community:2025.1'
+                }
+            }
+            steps {
+                sh '''qodana'''
+            }
+        }
         stage('Create Docker image and push 🐳') {
             steps {
                 script {
