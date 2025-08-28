@@ -47,7 +47,7 @@ pipeline {
                 }
             }
             steps {
-                sh '''qodana'''
+                sh '''qodana --property=project.open.type=Maven'''
             }
         }
         stage('Create Docker image and push 🐳') {
