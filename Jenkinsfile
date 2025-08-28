@@ -4,8 +4,12 @@ pipeline {
     stages {
         stage('Build and Test 🛠️') {
             steps {
-                sh './mvnw --batch-mode --no-transfer-progress -e -U clean install -DskipTests=true -T 1'
-                sh './mvnw --batch-mode --no-transfer-progress -e -U verify -Pjacoco -T 1'
+                script {
+                    currentBuild.displayName = "Build #${env.BUILD_NUMBER} - ${tag}"
+                    sh './mvnw --batch-mode --no-transfer-progress -e -U clean install -DskipTests=true -T 1'
+                    sh './mvnw --batch-mode --no-transfer-progress -e -U verify -Pjacoco -T 1'
+                }
+
             }
 
             post {
@@ -28,7 +32,7 @@ pipeline {
             steps {
                 script {
                     def namespace = "fvaescegeka"
-                    def tag = createTag("${env.BRANCH_NAME}")
+                    def tag = createTag("${env.BRANCH_NAME}", "${env.BUILD_NUMBER}")
                     def imageName = "${namespace}:${tag}"
 
                     withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', usernameVariable: 'DOCKERHUB_USERNAME', passwordVariable: 'DOCKERHUB_PASSWORD')]) {
@@ -42,13 +46,13 @@ pipeline {
     }
 }
 
-def createTag(String branchName) {
+def createTag(String branchName, String buildNumber) {
     def pom = readMavenPom(file: 'pom.xml')
     def version = pom.version
     if (branchName == 'main') {
         return version
     } else {
         def branchSuffix = branchName.contains('/') ? branchName.tokenize('/').last() : branchName
-        return "${version}.${branchSuffix}"
+        return "${version}.${branchSuffix}.alpha.${buildNumber}"
     }
 }
