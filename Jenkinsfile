@@ -65,6 +65,15 @@ pipeline {
                 }
             }
         }
+        stage('Git tag 🏷️') {
+            steps {
+                script {
+                    def tag = createTag("${env.BRANCH_NAME}", "${env.BUILD_NUMBER}")
+                    sh "git tag -a ${tag} -m 'Tag created by Jenkins for build ${tag}'"
+                    sh "git push origin ${tag}"
+                }
+            }
+        }
     }
 }
 
