@@ -69,6 +69,8 @@ pipeline {
         }
         stage('Git tag 🏷️') {
             steps {
+                def tag = createTag("${env.BRANCH_NAME}", "${env.BUILD_NUMBER}")
+
                 withCredentials([usernamePassword(credentialsId: 'github-up-credentials', usernameVariable: 'GITHUB_USERNAME', passwordVariable: 'GITHUB_PASSWORD')]) {
                     sh '''
                         git config --global credential.username $GITHUB_USERNAME
