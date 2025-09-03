@@ -1,4 +1,6 @@
 pipeline {
+
+    // docker agent
     agent any
 
     environment {
@@ -67,10 +69,15 @@ pipeline {
         }
         stage('Git tag 🏷️') {
             steps {
-                script {
-                    def tag = createTag("${env.BRANCH_NAME}", "${env.BUILD_NUMBER}")
-                    sh "git tag -a ${tag} -m 'Tag created by Jenkins for build ${tag}'"
-                    sh "git push origin ${tag}"
+                withCredentials([usernamePassword(credentialsId: 'github-up-credentials', usernameVariable: 'GITHUB_USERNAME', passwordVariable: 'GITHUB_PASSWORD')]) {
+                    sh '''
+                        git config --global credential.username $GITHUB_USERNAME
+                        git config --global credential.helper '!f() { echo password=$GITHUB_PASSWORD; }; f'
+                    '''
+                    sh """
+                        git tag -a ${tag} -m 'Tag created by Jenkins for build ${tag}'
+                        git push origin --tags
+                    """
                 }
             }
         }
