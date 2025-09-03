@@ -73,6 +73,7 @@ pipeline {
                     def tag = createTag("${env.BRANCH_NAME}", "${env.BUILD_NUMBER}")
 
                     sshagent(['github-credentials']) {
+                        sh "git remote set-url origin git@github.com:fvaes-cegeka/spring-petclinic.git"
                         sh "git tag -a ${tag} -m 'Tag created by Jenkins for build ${tag}'"
                         sh "git push origin ${tag}"
                     }
