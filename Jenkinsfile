@@ -1,4 +1,6 @@
 pipeline {
+
+    // docker agent
     agent any
 
     environment {
@@ -61,6 +63,19 @@ pipeline {
                         sh "docker build -t ${image} ."
                         sh "echo \$DOCKERHUB_PASSWORD | docker login -u \$DOCKERHUB_USERNAME --password-stdin"
                         sh "docker push ${image}"
+                    }
+                }
+            }
+        }
+        stage('Git tag 🏷️') {
+            steps {
+                script {
+                    def tag = createTag("${env.BRANCH_NAME}", "${env.BUILD_NUMBER}")
+
+                    sshagent(['github-credentials']) {
+                        sh "git remote set-url origin git@github.com:fvaes-cegeka/spring-petclinic.git"
+                        sh "git tag -a ${tag} -m 'Tag created by Jenkins for build ${tag}'"
+                        sh "git push origin ${tag}"
                     }
                 }
             }
