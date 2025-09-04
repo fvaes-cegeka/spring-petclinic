@@ -1,7 +1,11 @@
 pipeline {
 
-    // docker agent
-    agent any
+    agent {
+        docker {
+            image 'openjdk:17-jdk'
+            args '-v /var/run/docker.sock:/var/run/docker.sock'
+        }
+    }
 
     environment {
         PATH = "/usr/local/bin:${env.PATH}"
