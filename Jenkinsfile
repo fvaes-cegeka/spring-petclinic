@@ -12,7 +12,7 @@ pipeline {
         stage('Build and Test 🛠️') {
             agent {
                 docker {
-                    image 'maven:3.9.6-eclipse-temurin-17'
+                    image 'maven:3.9.6-eclipse-temurin-17-alpine'
                     args '-v /var/run/docker.sock:/var/run/docker.sock -v $HOME/.m2:/.m2'
                 }
             }
@@ -37,7 +37,7 @@ pipeline {
         stage('JaCoCo Report 📊') {
             agent {
                 docker {
-                    image 'maven:3.9.6-eclipse-temurin-17'
+                    image 'maven:3.9.6-eclipse-temurin-17-alpine'
                     args '-v /var/run/docker.sock:/var/run/docker.sock -v $HOME/.m2:/.m2'
                 }
             }
