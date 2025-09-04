@@ -1,11 +1,6 @@
 pipeline {
 
-    agent {
-        docker {
-            image 'maven:3.9.6-eclipse-temurin-17'
-            args '-v /var/run/docker.sock:/var/run/docker.sock -v $HOME/.m2:/.m2'
-        }
-    }
+    agent none
 
     environment {
         PATH = "/usr/local/bin:${env.PATH}"
@@ -15,6 +10,13 @@ pipeline {
 
     stages {
         stage('Build and Test 🛠️') {
+            agent {
+                docker {
+                    image 'maven:3.9.6-eclipse-temurin-17'
+                    args '-v /var/run/docker.sock:/var/run/docker.sock -v $HOME/.m2:/.m2'
+                }
+            }
+
             steps {
                 script {
                     def tag = createTag("${env.BRANCH_NAME}", "${env.BUILD_NUMBER}")
@@ -33,6 +35,12 @@ pipeline {
             }
         }
         stage('JaCoCo Report 📊') {
+            agent {
+                docker {
+                    image 'maven:3.9.6-eclipse-temurin-17'
+                    args '-v /var/run/docker.sock:/var/run/docker.sock -v $HOME/.m2:/.m2'
+                }
+            }
              steps {
                 jacoco(
                     execPattern: '**/jacoco.exec',
@@ -58,6 +66,13 @@ pipeline {
         }
         stage('Create Docker image and push 🐳') {
             steps {
+                agent {
+                    docker {
+                        image 'docker:24.0.5'
+                        args '-v /var/run/docker.sock:/var/run/docker.sock'
+                    }
+                }
+
                 script {
                     def imageName = "fvaescegeka/spring-petclinic"
                     def tag = createTag("${env.BRANCH_NAME}", "${env.BUILD_NUMBER}")
@@ -73,6 +88,13 @@ pipeline {
         }
         stage('Git tag 🏷️') {
             steps {
+                agent {
+                    docker {
+                        image 'alpine/git:latest'
+                        args '-v /var/run/docker.sock:/var/run/docker.sock'
+                    }
+                }
+
                 script {
                     def tag = createTag("${env.BRANCH_NAME}", "${env.BUILD_NUMBER}")
 
