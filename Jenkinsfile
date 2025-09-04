@@ -12,13 +12,14 @@ pipeline {
         stage('Build and Test 🛠️') {
             agent {
                 docker {
-                    image 'maven:3.9.6-eclipse-temurin-17-alpine'
+                    image 'maven:3.9.6-eclipse-temurin-17'
                     args '-v /var/run/docker.sock:/var/run/docker.sock -v $HOME/.m2:/.m2'
                 }
             }
 
             steps {
                 script {
+                    sh 'chmod +x ./mvnw'
                     def tag = createTag("${env.BRANCH_NAME}", "${env.BUILD_NUMBER}")
                     currentBuild.displayName = "Build #${env.BUILD_NUMBER} - ${tag}"
                     sh './mvnw --batch-mode --no-transfer-progress -e -U clean install -DskipTests=true -T 1'
@@ -37,7 +38,7 @@ pipeline {
         stage('JaCoCo Report 📊') {
             agent {
                 docker {
-                    image 'maven:3.9.6-eclipse-temurin-17-alpine'
+                    image 'maven:3.9.6-eclipse-temurin-17'
                     args '-v /var/run/docker.sock:/var/run/docker.sock -v $HOME/.m2:/.m2'
                 }
             }
