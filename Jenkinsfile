@@ -33,7 +33,7 @@ pipeline {
                                   path: /var/run/docker.sock
                               - name: maven-cache
                                 hostPath:
-                                  path: $HOME/.m2
+                                  path: /Users/ferrev/.m2
                         """
                     }
             }
@@ -60,7 +60,7 @@ pipeline {
             agent {
                 docker {
                     image 'fvaescegeka/docker-util:latest'
-                    args '-v /var/run/docker.sock:/var/run/docker.sock -v $HOME/.m2:/.m2'
+                    args '-v /var/run/docker.sock:/var/run/docker.sock -v /Users/ferrev/.m2:/.m2'
                 }
             }
              steps {
