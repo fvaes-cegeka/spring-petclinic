@@ -3,7 +3,7 @@ pipeline {
     agent {
         docker {
             image 'openjdk:17-jdk'
-            args '-v /var/run/docker.sock:/var/run/docker.sock'
+            args '-v /var/run/docker.sock:/var/run/docker.sock -v $HOME/.m2:/root/.m2'
         }
     }
 
