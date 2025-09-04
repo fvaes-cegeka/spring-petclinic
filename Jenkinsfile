@@ -11,10 +11,31 @@ pipeline {
     stages {
         stage('Build and Test 🛠️') {
             agent {
-                docker {
-                    image 'fvaescegeka/docker-util:latest'
-                    args '-v /var/run/docker.sock:/var/run/docker.sock -v $HOME/.m2:/.m2'
-                }
+                    kubernetes {
+                        yaml """
+                            apiVersion: v1
+                            kind: Pod
+                            spec:
+                              containers:
+                              - name: maven
+                                image: fvaescegeka/docker-util:latest
+                                command:
+                                - cat
+                                tty: true
+                                volumeMounts:
+                                - name: docker-sock
+                                  mountPath: /var/run/docker.sock
+                                - name: maven-cache
+                                  mountPath: /.m2
+                              volumes:
+                              - name: docker-sock
+                                hostPath:
+                                  path: /var/run/docker.sock
+                              - name: maven-cache
+                                hostPath:
+                                  path: $HOME/.m2
+                        """
+                    }
             }
 
             steps {
