@@ -13,10 +13,10 @@ profile:
 #  - name: <SomeEnabledInspectionId>
 
 #Disable inspections
-#exclude:
-#  - name: <SomeDisabledInspectionId>
-#    paths:
-#      - <path/where/not/run/inspection>
+exclude:
+  - name: "Maven repository"
+    paths:
+      - ".m2/repository"
 
 projectJDK: "21" #(Applied in CI/CD pipeline)
 
