@@ -65,13 +65,13 @@ pipeline {
             }
         }
         stage('Create Docker image and push 🐳') {
-            steps {
-                agent {
-                    docker {
-                        image 'docker:24.0.5'
-                        args '-v /var/run/docker.sock:/var/run/docker.sock'
-                    }
+            agent {
+                docker {
+                    image 'docker:24.0.5'
+                    args '-v /var/run/docker.sock:/var/run/docker.sock'
                 }
+            }
+            steps {
 
                 script {
                     def imageName = "fvaescegeka/spring-petclinic"
@@ -87,14 +87,13 @@ pipeline {
             }
         }
         stage('Git tag 🏷️') {
-            steps {
-                agent {
-                    docker {
-                        image 'alpine/git:latest'
-                        args '-v /var/run/docker.sock:/var/run/docker.sock'
-                    }
+            agent {
+                docker {
+                    image 'alpine/git:latest'
+                    args '-v /var/run/docker.sock:/var/run/docker.sock'
                 }
-
+            }
+            steps {
                 script {
                     def tag = createTag("${env.BRANCH_NAME}", "${env.BUILD_NUMBER}")
 
