@@ -1,6 +1,8 @@
 pipeline {
 
-    agent none
+    agent {
+        label 'macos-laptop-agent'  // Use your MacOS agent
+    }
 
     environment {
         PATH = "/usr/local/bin:${env.PATH}"
@@ -10,34 +12,6 @@ pipeline {
 
     stages {
         stage('Build and Test 🛠️') {
-            agent {
-                    kubernetes {
-                        yaml """
-                            apiVersion: v1
-                            kind: Pod
-                            spec:
-                              containers:
-                              - name: maven
-                                image: fvaescegeka/docker-util:latest
-                                command:
-                                - cat
-                                tty: true
-                                volumeMounts:
-                                - name: docker-sock
-                                  mountPath: /var/run/docker.sock
-                                - name: maven-cache
-                                  mountPath: /.m2
-                              volumes:
-                              - name: docker-sock
-                                hostPath:
-                                  path: /var/run/docker.sock
-                              - name: maven-cache
-                                hostPath:
-                                  path: /Users/ferrev/.m2
-                        """
-                    }
-            }
-
             steps {
                 script {
                     sh 'chmod +x ./mvnw'
@@ -57,12 +31,6 @@ pipeline {
             }
         }
         stage('JaCoCo Report 📊') {
-            agent {
-                docker {
-                    image 'fvaescegeka/docker-util:latest'
-                    args '-v /var/run/docker.sock:/var/run/docker.sock -v /Users/ferrev/.m2:/.m2'
-                }
-            }
              steps {
                 jacoco(
                     execPattern: '**/jacoco.exec',
@@ -87,12 +55,6 @@ pipeline {
             }
         }
         stage('Create Docker image and push 🐳') {
-            agent {
-                docker {
-                    image 'docker:24.0.5'
-                    args '-v /var/run/docker.sock:/var/run/docker.sock'
-                }
-            }
             steps {
 
                 script {
@@ -109,12 +71,6 @@ pipeline {
             }
         }
         stage('Git tag 🏷️') {
-            agent {
-                docker {
-                    image 'alpine/git:latest'
-                    args '-v /var/run/docker.sock:/var/run/docker.sock'
-                }
-            }
             steps {
                 script {
                     def tag = createTag("${env.BRANCH_NAME}", "${env.BUILD_NUMBER}")
