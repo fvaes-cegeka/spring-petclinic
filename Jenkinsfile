@@ -1,8 +1,6 @@
 pipeline {
 
-    agent {
-        label 'macos-laptop-agent'  // Use your MacOS agent
-    }
+    agent any
 
     environment {
         PATH = "/usr/local/bin:${env.PATH}"
@@ -56,7 +54,6 @@ pipeline {
         }
         stage('Create Docker image and push 🐳') {
             steps {
-
                 script {
                     def imageName = "fvaescegeka/spring-petclinic"
                     def tag = createTag("${env.BRANCH_NAME}", "${env.BUILD_NUMBER}")
