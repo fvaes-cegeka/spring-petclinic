@@ -1,4 +1,5 @@
 @Library('shared-library@main') _
-BuildServicePipeline {
 
+BuildServicePipeline {
+    buildStageName="this is a custom build stage name"
 }
